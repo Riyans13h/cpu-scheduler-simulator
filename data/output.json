@@ -1,62 +1,81 @@
 {
-    "average_turnaround": 14.0,
-    "average_waiting": 8.5,
+    "average_turnaround": 14.6,
+    "average_waiting": 8.0,
     "gantt_chart": [
         "P1",
         "P1",
-        "P1",
         "P2",
         "P2",
         "P2",
+        "P2",
         "P3",
         "P3",
         "P3",
-        "P4",
-        "P4",
-        "P4",
+        "P3",
+        "P3",
+        "P3",
+        "P5",
+        "P5",
+        "P5",
+        "P5",
+        "P5",
         "P1",
         "P1",
-        "P3",
-        "P3",
-        "P3",
+        "P1",
+        "P1",
+        "P1",
+        "P1",
+        "P1",
+        "P1",
         "P4",
         "P4",
         "P4",
-        "P3",
-        "P3"
+        "P4",
+        "P4",
+        "P4",
+        "P4",
+        "P4"
     ],
     "results": [
         {
             "arrival": 0,
-            "burst": 5,
-            "completion": 14,
+            "burst": 10,
+            "completion": 25,
             "pid": "P1",
-            "turnaround": 14,
-            "waiting": 9
-        },
-        {
-            "arrival": 1,
-            "burst": 3,
-            "completion": 6,
-            "pid": "P2",
-            "turnaround": 5,
-            "waiting": 2
+            "turnaround": 25,
+            "waiting": 15
         },
         {
             "arrival": 2,
-            "burst": 8,
-            "completion": 22,
-            "pid": "P3",
-            "turnaround": 20,
-            "waiting": 12
+            "burst": 4,
+            "completion": 6,
+            "pid": "P2",
+            "turnaround": 4,
+            "waiting": 0
         },
         {
-            "arrival": 3,
+            "arrival": 4,
             "burst": 6,
-            "completion": 20,
+            "completion": 12,
+            "pid": "P3",
+            "turnaround": 8,
+            "waiting": 2
+        },
+        {
+            "arrival": 6,
+            "burst": 8,
+            "completion": 33,
             "pid": "P4",
-            "turnaround": 17,
-            "waiting": 11
+            "turnaround": 27,
+            "waiting": 19
+        },
+        {
+            "arrival": 8,
+            "burst": 5,
+            "completion": 17,
+            "pid": "P5",
+            "turnaround": 9,
+            "waiting": 4
         }
     ]
 }

@@ -1,0 +1,28 @@
+# CPU Scheduling Test Input – Compatible with All Algorithms
+
+# ------------------------------------------------------------
+# Notes:
+# - Arrival times are staggered to test preemption.
+# - Burst times vary for SJF and LJF algorithms.
+# - Priorities differ to test Priority Scheduling correctness.
+# - Queues are used in MQS (Multiple Queue Scheduling) and MLFQ.
+# - Quantum value is required by Round Robin and MLFQ algorithms.
+# ------------------------------------------------------------
+
+# Quantum (used in RR and MLFQ)
+QUANTUM = 3
+
+# ------------------------------------------------------------
+# Common Scheduling Metrics:
+# Turnaround Time = Completion Time - Arrival Time
+# Waiting Time    = Turnaround Time - Burst Time
+# Response Ratio  = (Waiting Time + Burst Time) / Burst Time  [HRRN]
+# ------------------------------------------------------------
+
+# Process List
+# Format: PID    Arrival  Burst   Priority  Queue
+P1      0        10       2        1
+P2      2        4        1        2
+P3      4        6        3        1
+P4      6        8        2        2
+P5      8        5        1        1
