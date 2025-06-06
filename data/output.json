@@ -1,0 +1,62 @@
+{
+    "average_turnaround": 14.0,
+    "average_waiting": 8.5,
+    "gantt_chart": [
+        "P1",
+        "P1",
+        "P1",
+        "P2",
+        "P2",
+        "P2",
+        "P3",
+        "P3",
+        "P3",
+        "P4",
+        "P4",
+        "P4",
+        "P1",
+        "P1",
+        "P3",
+        "P3",
+        "P3",
+        "P4",
+        "P4",
+        "P4",
+        "P3",
+        "P3"
+    ],
+    "results": [
+        {
+            "arrival": 0,
+            "burst": 5,
+            "completion": 14,
+            "pid": "P1",
+            "turnaround": 14,
+            "waiting": 9
+        },
+        {
+            "arrival": 1,
+            "burst": 3,
+            "completion": 6,
+            "pid": "P2",
+            "turnaround": 5,
+            "waiting": 2
+        },
+        {
+            "arrival": 2,
+            "burst": 8,
+            "completion": 22,
+            "pid": "P3",
+            "turnaround": 20,
+            "waiting": 12
+        },
+        {
+            "arrival": 3,
+            "burst": 6,
+            "completion": 20,
+            "pid": "P4",
+            "turnaround": 17,
+            "waiting": 11
+        }
+    ]
+}
