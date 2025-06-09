@@ -32,7 +32,9 @@ int main() {
         return 1;
     }
 
-    int quantum = input["time_quantum"];
+    // ✅ FIXED: Use correct key "quantum" and fallback to 2 if missing
+    int quantum = input.value("quantum", 2);
+
     std::vector<Process> processes;
     for (auto &p : input["processes"]) {
         int burst = p["burst"];
@@ -77,7 +79,7 @@ int main() {
             completed++;
         }
 
-        // Re-add to queue if still remaining
+        // Enqueue any new arriving processes
         for (int i = 0; i < n; ++i) {
             if (processes[i].arrival <= time && !inQueue[i] && processes[i].remaining > 0) {
                 readyQueue.push(i);
@@ -85,6 +87,7 @@ int main() {
             }
         }
 
+        // Re-add current process if it's not finished
         if (processes[idx].remaining > 0) {
             readyQueue.push(idx);
         } else {
@@ -92,7 +95,7 @@ int main() {
         }
     }
 
-    // Output
+    // Prepare output JSON
     json output;
     output["gantt_chart"] = gantt;
 
