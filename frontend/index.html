@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CPU Scheduling Simulator</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <h1>CPU Scheduling Simulator</h1>
+
+  <form id="schedulerForm">
+    <label for="algorithm">Select Algorithm:</label>
+    <select id="algorithm" name="algorithm">
+      <option value="fcfs">First Come First Serve</option>
+      <option value="sjf">Shortest Job First</option>
+      <option value="srtf">SRTF</option>
+      <option value="priority">Priority</option>
+      <option value="rr">Round Robin</option>
+      <option value="hrrn">HRRN</option>
+      <option value="mqs">Multiple Queue Scheduling</option>
+      <option value="mlfq">Multilevel Feedback Queue</option>
+      <option value="ljf">LJF</option>
+      <option value="lrtf">LRTF</option>
+    </select>
+
+    <label for="quantum">Time Quantum (Only for RR):</label>
+    <input type="number" id="quantum" name="time_quantum" min="1" value="2"/>
+
+    <h3>Processes</h3>
+    <table id="processTable">
+      <thead>
+        <tr>
+          <th>PID</th>
+          <th>Arrival</th>
+          <th>Burst</th>
+          <th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input name="pid" value="P1"/></td>
+          <td><input name="arrival" value="0" type="number"/></td>
+          <td><input name="burst" value="5" type="number"/></td>
+          <td><input name="priority" value="2" type="number"/></td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" onclick="addProcess()">➕ Add Process</button>
+    <button type="submit">▶ Run Simulation</button>
+  </form>
+
+  <div id="outputSection" style="display:none;">
+    <h3>Gantt Chart</h3>
+    <div id="ganttChart"></div>
+
+    <h3>Results</h3>
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>PID</th>
+          <th>Arrival</th>
+          <th>Burst</th>
+          <th>Completion</th>
+          <th>Turnaround</th>
+          <th>Waiting</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p><strong>Average Waiting Time:</strong> <span id="avgWaiting"></span></p>
+    <p><strong>Average Turnaround Time:</strong> <span id="avgTurnaround"></span></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

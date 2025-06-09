@@ -1,0 +1,40 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 30px;
+  background: #f9f9f9;
+}
+
+h1 {
+  text-align: center;
+}
+
+form, table {
+  margin: 20px auto;
+  width: 90%;
+  max-width: 800px;
+}
+
+table, th, td {
+  border: 1px solid #aaa;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+}
+
+#ganttChart {
+  margin: 20px;
+  padding: 10px;
+  background: #eee;
+  display: flex;
+}
+
+#ganttChart span {
+  margin: 0 2px;
+  padding: 5px 10px;
+  background: #4caf50;
+  color: white;
+  border-radius: 3px;
+}
