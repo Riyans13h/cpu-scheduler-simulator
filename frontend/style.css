@@ -1,29 +1,84 @@
+/* Base Styles */
 body {
-  font-family: Arial, sans-serif;
-  margin: 30px;
-  background: #f9f9f9;
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 30px;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
 }
 
+/* Container for centering content */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Typography */
 h1 {
   text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-weight: 600;
+  position: relative;
 }
 
-form, table {
-  margin: 20px auto;
+h1::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: #4caf50;
+  margin: 15px auto 0;
+}
+
+/* Forms */
+form {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  margin: 30px auto;
+  transition: all 0.3s ease;
+}
+
+form:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+/* Tables */
+table {
   width: 90%;
   max-width: 800px;
-}
-
-table, th, td {
-  border: 1px solid #aaa;
+  margin: 30px auto;
   border-collapse: collapse;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 th, td {
-  padding: 10px;
+  padding: 12px 15px;
   text-align: center;
+  border: 1px solid #ddd;
 }
 
+th {
+  background-color: #2c3e50;
+  color: white;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+tr:hover {
+  background-color: #f1f8e9;
+}
+
+/* Gantt Chart (unchanged as requested) */
 #ganttChart {
   margin: 20px;
   padding: 10px;
@@ -37,4 +92,34 @@ th, td {
   background: #4caf50;
   color: white;
   border-radius: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  th, td {
+    padding: 8px 10px;
+  }
+}
+
+/* Button styling (if you have buttons) */
+button, input[type="submit"] {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover, input[type="submit"]:hover {
+  background-color: #3d8b40;
 }
