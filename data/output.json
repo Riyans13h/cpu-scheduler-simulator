@@ -1,10 +1,59 @@
 {
-    "average_turnaround": 8.333333333333334,
-    "average_waiting": 1.6666666666666667,
+    "average_turnaround": 21.77777777777778,
+    "average_waiting": 16.0,
     "gantt_chart": [
         "P1",
-        "P621",
-        "P3"
+        "P1",
+        "P1",
+        "P1",
+        "P1",
+        "P8",
+        "P8",
+        "P2",
+        "P2",
+        "P2",
+        "P2",
+        "P2",
+        "P3",
+        "P3",
+        "P3",
+        "P3",
+        "P3",
+        "P5",
+        "P5",
+        "P5",
+        "P5",
+        "P5",
+        "P445",
+        "P445",
+        "P445",
+        "P445",
+        "P445",
+        "P4",
+        "P4",
+        "P4",
+        "P4",
+        "P4",
+        "P4",
+        "P4",
+        "P7",
+        "P7",
+        "P7",
+        "P7",
+        "P7",
+        "P7",
+        "P7",
+        "P6",
+        "P6",
+        "P6",
+        "P6",
+        "P6",
+        "P6",
+        "P6",
+        "P6",
+        "P6",
+        "P6",
+        "P6"
     ],
     "results": [
         {
@@ -16,20 +65,68 @@
             "waiting": 0
         },
         {
-            "arrival": 10,
-            "burst": 10,
-            "completion": 20,
+            "arrival": 1,
+            "burst": 5,
+            "completion": 12,
+            "pid": "P2",
+            "turnaround": 11,
+            "waiting": 6
+        },
+        {
+            "arrival": 2,
+            "burst": 5,
+            "completion": 17,
             "pid": "P3",
-            "turnaround": 10,
-            "waiting": 0
+            "turnaround": 15,
+            "waiting": 10
+        },
+        {
+            "arrival": 3,
+            "burst": 7,
+            "completion": 34,
+            "pid": "P4",
+            "turnaround": 31,
+            "waiting": 24
+        },
+        {
+            "arrival": 4,
+            "burst": 5,
+            "completion": 22,
+            "pid": "P5",
+            "turnaround": 18,
+            "waiting": 13
+        },
+        {
+            "arrival": 3,
+            "burst": 11,
+            "completion": 52,
+            "pid": "P6",
+            "turnaround": 49,
+            "waiting": 38
+        },
+        {
+            "arrival": 4,
+            "burst": 7,
+            "completion": 41,
+            "pid": "P7",
+            "turnaround": 37,
+            "waiting": 30
+        },
+        {
+            "arrival": 4,
+            "burst": 2,
+            "completion": 7,
+            "pid": "P8",
+            "turnaround": 3,
+            "waiting": 1
         },
         {
             "arrival": 0,
             "burst": 5,
-            "completion": 10,
-            "pid": "P621",
-            "turnaround": 10,
-            "waiting": 5
+            "completion": 27,
+            "pid": "P445",
+            "turnaround": 27,
+            "waiting": 22
         }
     ]
 }
