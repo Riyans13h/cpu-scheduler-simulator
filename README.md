@@ -1,4 +1,4 @@
-Here are **key technical interview discussion points** based on your **CPU Scheduling Simulator** project, organized by topic to help you confidently explain your contributions:
+
 
 ---
 
@@ -114,11 +114,10 @@ Perfect! Based on **your actual project structure** (`cpu-scheduler-simulator`) 
 * **Node.js server integration**,
 * **HTML/CSS/JavaScript frontend with Gantt chart rendering**,
 
-here’s a set of **ATS-friendly, numeric, and technical bullet points** tailored for your resume:
 
 ---
 
-### ✅ Resume Bullet Points for `CPU Scheduler Simulator`
+
 
 * 🔧 **Engineered a modular CPU Scheduling Simulator** in **C++** implementing **8 algorithms** (FCFS, SJF, SRTF, RR, Priority, HRRN, MQS, MLFQ), with JSON input/output handling using `nlohmann::json`.
 
