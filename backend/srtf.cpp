@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <queue>
 #include <algorithm>
 #include "json.hpp"
 
@@ -14,13 +15,23 @@ struct Process {
     int completion = 0;
     int turnaround = 0;
     int waiting = 0;
-    bool finished = false;
+    bool added = false;  // To ensure a process is only added once
+};
+
+// Comparator for min-heap (shortest remaining time first)
+struct CompareRemaining {
+    bool operator()(const Process* a, const Process* b) const {
+        if (a->remaining == b->remaining)
+            return a->arrival > b->arrival; // Tie-breaker: earlier arrival first
+        return a->remaining > b->remaining; // Smaller remaining time first
+    }
 };
 
 int main() {
+    // Step 1: Read JSON input
     std::ifstream inFile("../data/input.json");
     if (!inFile) {
-        std::cerr << "❌ Error: Cannot open input.json\n";
+        std::cerr << "Error: Cannot open input.json\n";
         return 1;
     }
 
@@ -28,53 +39,65 @@ int main() {
     try {
         inFile >> input;
     } catch (std::exception &e) {
-        std::cerr << "❌ JSON Error: " << e.what() << std::endl;
+        std::cerr << "JSON Error: " << e.what() << std::endl;
         return 1;
     }
 
+    // Step 2: Load processes
     std::vector<Process> processes;
-    for (auto &p : input["processes"]) {
+    for (const auto &p : input["processes"]) {
         int burst = p["burst"];
         processes.push_back({p["pid"], p["arrival"], burst, burst});
     }
 
-    int time = 0, completed = 0;
+    int time = 0;
+    int completed = 0;
     int n = processes.size();
     std::vector<std::string> gantt;
 
-    while (completed < n) {
-        int idx = -1;
-        int minRemaining = INT32_MAX;
+    // Priority queue to pick the process with shortest remaining time
+    std::priority_queue<Process*, std::vector<Process*>, CompareRemaining> pq;
 
-        for (int i = 0; i < n; ++i) {
-            if (!processes[i].finished && processes[i].arrival <= time && processes[i].remaining < minRemaining && processes[i].remaining > 0) {
-                minRemaining = processes[i].remaining;
-                idx = i;
+    // Step 3: Main simulation loop
+    while (completed < n) {
+        // Add newly arrived processes to the queue
+        for (auto &p : processes) {
+            if (p.arrival <= time && !p.added) {
+                pq.push(&p);
+                p.added = true;
             }
         }
 
-        if (idx != -1) {
-            processes[idx].remaining--;
-            gantt.push_back(processes[idx].pid);
+        if (!pq.empty()) {
+            Process* current = pq.top();
+            pq.pop();
 
-            if (processes[idx].remaining == 0) {
-                processes[idx].completion = time + 1;
-                processes[idx].turnaround = processes[idx].completion - processes[idx].arrival;
-                processes[idx].waiting = processes[idx].turnaround - processes[idx].burst;
-                processes[idx].finished = true;
+            // Execute 1 unit of the process
+            gantt.push_back(current->pid);
+            current->remaining--;
+
+            if (current->remaining == 0) {
+                current->completion = time + 1;
+                current->turnaround = current->completion - current->arrival;
+                current->waiting = current->turnaround - current->burst;
                 completed++;
+            } else {
+                pq.push(current); // Reinsert with updated remaining time
             }
         } else {
-            gantt.push_back("idle");
+            gantt.push_back("idle"); // No process available, CPU idle
         }
+
         time++;
     }
 
-    // Output
+    // Step 4: Prepare output
     json output;
     output["gantt_chart"] = gantt;
 
-    double total_waiting = 0, total_turnaround = 0;
+    double total_waiting = 0;
+    double total_turnaround = 0;
+
     for (const auto &p : processes) {
         output["results"].push_back({
             {"pid", p.pid},
@@ -84,6 +107,7 @@ int main() {
             {"turnaround", p.turnaround},
             {"waiting", p.waiting}
         });
+
         total_waiting += p.waiting;
         total_turnaround += p.turnaround;
     }
@@ -91,9 +115,14 @@ int main() {
     output["average_waiting"] = total_waiting / n;
     output["average_turnaround"] = total_turnaround / n;
 
+    // Step 5: Write output to file
     std::ofstream outFile("../data/output.json");
+    if (!outFile) {
+        std::cerr << "Error: Cannot write to output.json\n";
+        return 1;
+    }
     outFile << output.dump(4);
 
-    std::cout << "✅ SRTF scheduling complete. Output saved to output.json\n";
+    std::cout << "SRTF scheduling complete. Output saved to output.json\n";
     return 0;
 }
