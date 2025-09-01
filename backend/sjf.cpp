@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <queue>
 #include <algorithm>
 #include "json.hpp"
 
@@ -13,7 +14,16 @@ struct Process {
     int completion = 0;
     int turnaround = 0;
     int waiting = 0;
-    bool finished = false;
+    bool operator>(const Process& other) const {
+        return burst > other.burst; // min-heap on burst
+    }
+};
+
+// Custom comparator for priority queue
+struct CompareBurst {
+    bool operator()(const Process& a, const Process& b) {
+        return a.burst > b.burst;
+    }
 };
 
 int main() {
@@ -31,36 +41,47 @@ int main() {
         return 1;
     }
 
-    std::vector<Process> processes;
+    std::vector<Process> allProcesses;
     for (auto &p : input["processes"]) {
-        processes.push_back({p["pid"], p["arrival"], p["burst"]});
+        allProcesses.push_back({p["pid"], p["arrival"], p["burst"]});
     }
 
-    int time = 0, completed = 0, n = processes.size();
+    int time = 0, completed = 0, n = allProcesses.size();
     std::vector<std::string> gantt;
+    std::priority_queue<Process, std::vector<Process>, CompareBurst> pq;
+    std::vector<bool> added(n, false);
 
     while (completed < n) {
-        int idx = -1;
-        int minBurst = INT32_MAX;
-
+        // Add available processes to the priority queue
         for (int i = 0; i < n; ++i) {
-            if (!processes[i].finished && processes[i].arrival <= time && processes[i].burst < minBurst) {
-                minBurst = processes[i].burst;
-                idx = i;
+            if (!added[i] && allProcesses[i].arrival <= time) {
+                pq.push(allProcesses[i]);
+                added[i] = true;
             }
         }
 
-        if (idx != -1) {
-            Process &p = processes[idx];
-            for (int t = 0; t < p.burst; ++t) {
-                gantt.push_back(p.pid);
+        if (!pq.empty()) {
+            Process current = pq.top(); pq.pop();
+
+            for (int t = 0; t < current.burst; ++t) {
+                gantt.push_back(current.pid);
             }
 
-            time += p.burst;
-            p.completion = time;
-            p.turnaround = p.completion - p.arrival;
-            p.waiting = p.turnaround - p.burst;
-            p.finished = true;
+            time += current.burst;
+            current.completion = time;
+            current.turnaround = current.completion - current.arrival;
+            current.waiting = current.turnaround - current.burst;
+
+            // Update original process vector
+            for (auto &p : allProcesses) {
+                if (p.pid == current.pid && p.arrival == current.arrival) {
+                    p.completion = current.completion;
+                    p.turnaround = current.turnaround;
+                    p.waiting = current.waiting;
+                    break;
+                }
+            }
+
             completed++;
         } else {
             gantt.push_back("idle");
@@ -73,7 +94,7 @@ int main() {
     output["gantt_chart"] = gantt;
 
     double total_waiting = 0, total_turnaround = 0;
-    for (const auto &p : processes) {
+    for (const auto &p : allProcesses) {
         output["results"].push_back({
             {"pid", p.pid},
             {"arrival", p.arrival},
@@ -92,6 +113,6 @@ int main() {
     std::ofstream outFile("../data/output.json");
     outFile << output.dump(4);
 
-    std::cout << "✅ SJF scheduling complete. Output saved to output.json\n";
+    std::cout << "✅ SJF scheduling (via priority queue) complete. Output saved to output.json\n";
     return 0;
 }
