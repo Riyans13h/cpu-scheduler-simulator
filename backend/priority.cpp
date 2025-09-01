@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <queue>
 #include <climits>
 #include <algorithm>
 #include "json.hpp"
@@ -16,12 +17,22 @@ struct Process {
     int turnaround = 0;
     int waiting = 0;
     bool done = false;
+    bool added = false; // to prevent re-adding
+};
+
+// Custom comparator for max-heap: higher priority first, if equal then earlier arrival
+struct Compare {
+    bool operator()(const Process* a, const Process* b) const {
+        if (a->priority == b->priority)
+            return a->arrival > b->arrival;  // earlier arrival preferred
+        return a->priority > b->priority;    // smaller number = higher priority
+    }
 };
 
 int main() {
     std::ifstream inFile("../data/input.json");
     if (!inFile) {
-        std::cerr << "❌ Error: Cannot open input.json\n";
+        std::cerr << "Error: Cannot open input.json\n";
         return 1;
     }
 
@@ -29,7 +40,7 @@ int main() {
     try {
         inFile >> input;
     } catch (std::exception &e) {
-        std::cerr << "❌ JSON Parse Error: " << e.what() << std::endl;
+        std::cerr << "JSON Parse Error: " << e.what() << std::endl;
         return 1;
     }
 
@@ -40,38 +51,45 @@ int main() {
         });
     }
 
-    int time = 0, completed = 0, n = processes.size();
+    // Sort processes by arrival time for easier handling
+    std::sort(processes.begin(), processes.end(), [](const Process &a, const Process &b) {
+        return a.arrival < b.arrival;
+    });
+
+    std::priority_queue<Process*, std::vector<Process*>, Compare> pq;
+
+    int time = 0, completed = 0, n = processes.size(), i = 0;
     std::vector<std::string> gantt;
 
     while (completed < n) {
-        int idx = -1;
-        int highestPriority = INT_MAX;
-
-        for (int i = 0; i < n; ++i) {
-            if (!processes[i].done && processes[i].arrival <= time && processes[i].priority < highestPriority) {
-                highestPriority = processes[i].priority;
-                idx = i;
+        // Add all processes that have arrived at current time
+        while (i < n && processes[i].arrival <= time) {
+            if (!processes[i].added) {
+                pq.push(&processes[i]);
+                processes[i].added = true;
             }
+            ++i;
         }
 
-        if (idx == -1) {
+        if (!pq.empty()) {
+            Process* current = pq.top(); pq.pop();
+            for (int t = 0; t < current->burst; ++t) {
+                gantt.push_back(current->pid);
+            }
+
+            time += current->burst;
+            current->completion = time;
+            current->turnaround = current->completion - current->arrival;
+            current->waiting = current->turnaround - current->burst;
+            current->done = true;
+            completed++;
+        } else {
             gantt.push_back("idle");
             time++;
-            continue;
         }
-
-        Process &p = processes[idx];
-        for (int t = 0; t < p.burst; ++t) gantt.push_back(p.pid);
-
-        time += p.burst;
-        p.completion = time;
-        p.turnaround = p.completion - p.arrival;
-        p.waiting = p.turnaround - p.burst;
-        p.done = true;
-        completed++;
     }
 
-    // Output
+    // Output JSON
     json output;
     output["gantt_chart"] = gantt;
 
@@ -96,6 +114,6 @@ int main() {
     std::ofstream outFile("../data/output.json");
     outFile << output.dump(4);
 
-    std::cout << "✅ Priority scheduling complete. Output saved to output.json\n";
+    std::cout << "Priority scheduling (using max-heap) complete. Output saved to output.json\n";
     return 0;
 }
