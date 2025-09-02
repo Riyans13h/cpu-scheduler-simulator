@@ -11,113 +11,111 @@ struct Process {
     std::string pid;
     int arrival;
     int burst;
-    int queue; // 1 = high priority (RR), 2 = low priority (FCFS)
     int remaining;
+    int priority; // 1 = high, 2 = low
     int completion = 0;
     int turnaround = 0;
     int waiting = 0;
-    bool done = false;
+};
+
+// Comparator for priority queue
+struct Compare {
+    bool operator()(const Process* a, const Process* b) {
+        if (a->priority != b->priority)
+            return a->priority > b->priority; // lower number = higher priority
+        return a->arrival > b->arrival;       // earlier arrival first if same priority
+    }
 };
 
 int main() {
     std::ifstream inFile("../data/input.json");
     if (!inFile) {
-        std::cerr << "❌ Error: Cannot open input.json\n";
+        std::cerr << "❌ Cannot open input.json\n";
         return 1;
     }
 
     json input;
-    try {
-        inFile >> input;
-    } catch (std::exception &e) {
-        std::cerr << "❌ JSON Parse Error: " << e.what() << std::endl;
-        return 1;
-    }
+    inFile >> input;
+
+    int quantum = input.value("quantum", 2); // For high-priority RR
 
     std::vector<Process> processes;
     for (auto &p : input["processes"]) {
-        processes.push_back({
-            p["pid"], p["arrival"], p["burst"], p["queue"], p["burst"]
-        });
+        int burst = p["burst"];
+        processes.push_back({p["pid"], p["arrival"], burst, burst, p["queue"]});
     }
 
+    auto cmp = Compare();
+    std::priority_queue<Process*, std::vector<Process*>, Compare> pq;
     int time = 0, completed = 0, n = processes.size();
-    const int quantum = 2;
     std::vector<std::string> gantt;
-
-    std::queue<int> q1, q2;
-    std::vector<bool> added(n, false);
+    std::vector<bool> inQueue(n, false);
 
     while (completed < n) {
-        // Add new arrivals to queues
+        // Add newly arrived processes
         for (int i = 0; i < n; ++i) {
-            if (!added[i] && processes[i].arrival <= time) {
-                if (processes[i].queue == 1) q1.push(i);
-                else q2.push(i);
-                added[i] = true;
+            if (processes[i].arrival <= time && !inQueue[i] && processes[i].remaining > 0) {
+                pq.push(&processes[i]);
+                inQueue[i] = true;
             }
         }
 
-        if (!q1.empty()) {
-            int idx = q1.front(); q1.pop();
-            int exec = std::min(quantum, processes[idx].remaining);
+        if (pq.empty()) {
+            gantt.push_back("idle");
+            time++;
+            continue;
+        }
 
-            for (int t = 0; t < exec; ++t) {
-                gantt.push_back(processes[idx].pid);
+        Process* p = pq.top();
+        pq.pop();
+
+        if (p->priority == 1) { // High priority -> Round Robin
+            int execTime = std::min(quantum, p->remaining);
+            for (int t = 0; t < execTime; ++t) {
+                gantt.push_back(p->pid);
                 time++;
 
-                // Add any new arrivals during execution
+                // Add newly arrived processes during execution
                 for (int i = 0; i < n; ++i) {
-                    if (!added[i] && processes[i].arrival <= time) {
-                        if (processes[i].queue == 1) q1.push(i);
-                        else q2.push(i);
-                        added[i] = true;
+                    if (processes[i].arrival <= time && !inQueue[i] && processes[i].remaining > 0) {
+                        pq.push(&processes[i]);
+                        inQueue[i] = true;
                     }
                 }
             }
 
-            processes[idx].remaining -= exec;
-
-            if (processes[idx].remaining > 0)
-                q1.push(idx); // Not finished, requeue
+            p->remaining -= execTime;
+            if (p->remaining > 0) pq.push(p);
             else {
-                processes[idx].completion = time;
-                processes[idx].turnaround = time - processes[idx].arrival;
-                processes[idx].waiting = processes[idx].turnaround - processes[idx].burst;
-                processes[idx].done = true;
+                p->completion = time;
+                p->turnaround = p->completion - p->arrival;
+                p->waiting = p->turnaround - p->burst;
                 completed++;
             }
 
-        } else if (!q2.empty()) {
-            int idx = q2.front(); q2.pop();
-            for (int t = 0; t < processes[idx].remaining; ++t) {
-                gantt.push_back(processes[idx].pid);
+        } else { // Low priority -> FCFS
+            for (int t = 0; t < p->remaining; ++t) {
+                gantt.push_back(p->pid);
                 time++;
 
-                // Add arrivals
+                // Add newly arrived processes
                 for (int i = 0; i < n; ++i) {
-                    if (!added[i] && processes[i].arrival <= time) {
-                        if (processes[i].queue == 1) q1.push(i);
-                        else q2.push(i);
-                        added[i] = true;
+                    if (processes[i].arrival <= time && !inQueue[i] && processes[i].remaining > 0) {
+                        pq.push(&processes[i]);
+                        inQueue[i] = true;
                     }
                 }
             }
 
-            processes[idx].remaining = 0;
-            processes[idx].completion = time;
-            processes[idx].turnaround = time - processes[idx].arrival;
-            processes[idx].waiting = processes[idx].turnaround - processes[idx].burst;
-            processes[idx].done = true;
+            p->remaining = 0;
+            p->completion = time;
+            p->turnaround = p->completion - p->arrival;
+            p->waiting = p->turnaround - p->burst;
             completed++;
-
-        } else {
-            gantt.push_back("idle");
-            time++;
         }
     }
 
-    // Output
+    // Output JSON
     json output;
     output["gantt_chart"] = gantt;
 
@@ -127,7 +125,7 @@ int main() {
             {"pid", p.pid},
             {"arrival", p.arrival},
             {"burst", p.burst},
-            {"queue", p.queue},
+            {"queue", p.priority},
             {"completion", p.completion},
             {"turnaround", p.turnaround},
             {"waiting", p.waiting}
@@ -142,6 +140,6 @@ int main() {
     std::ofstream outFile("../data/output.json");
     outFile << output.dump(4);
 
-    std::cout << "✅ Multiple Queue scheduling complete. Output saved to output.json\n";
+    std::cout << "✅ Multi-Level Queue (priority queue) scheduling complete.\n";
     return 0;
 }
